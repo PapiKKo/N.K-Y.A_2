@@ -213,6 +213,22 @@ function deviceorientationHandler(event) {
       }
 }
 
+function deviceMotionHandler(event){
+          let a_x = event.acceleration.x;
+          let a_y = event.acceleration.y;
+          let a_z = event.acceleration.z;
+          if (a_x > 5 || a_x < -5) {
+            data = [{"btn": {"11":true}, "dur":-1}];
+          }
+          else data = [{"btn": {"11":true}, "dur":-1}];
+          if (a_y > 5 || a_y < -5) {
+            data = [{"btn": {"11":true}, "dur":-1}];
+          }else data = [{"btn": {"11":true}, "dur":-1}];
+          if (a_z > 5 || a_z < -5) {
+            data = [{"btn": {"11":true}, "dur":-1}];
+          }else data = [{"btn": {"11":true}, "dur":-1}];
+}
+
 var manager = function(){
   if (data.length !== 0){
     send(data);    
