@@ -22,6 +22,9 @@ tilt orientation:
 <input id="portlait" type="radio" name="direction" value="portlait" checked >portlait
 <input id="landscape" type="radio" name="direction" value="landscape">landscape
 <br>
+button motion: 
+<input id="a_btn" type="radio" name="button" value="btn" checked >A
+<br>
 <button id="b10" style="width:150px;height:150px">10B</button>
 <button id="b11" style="width:150px;height:150px">11A</button>
 <br>
@@ -152,7 +155,7 @@ document.documentElement.addEventListener('touchend', function (e) {
 }, false);
 
 var data = [];
-const th = 30;
+const th = 10;
 var pax =0, pay = 0;
 function deviceorientationHandler(event) {
       let beta = event.beta;// X  -90 up +90 down
@@ -213,20 +216,31 @@ function deviceorientationHandler(event) {
       }
 }
 
-function deviceMotionHandler(event){
+function devicemotionHandler(event){
           let a_x = event.acceleration.x;
           let a_y = event.acceleration.y;
           let a_z = event.acceleration.z;
-          if (a_x > 5 || a_x < -5) {
-            data = [{"btn": {"11":true}, "dur":-1}];
+          if ($('#a_btn').prop('checked')){
+            if (a_x < -5) {
+              data = [{"btn": {"10":true}, "dur":-1}];
+            }
+            else if (a_x > 0) {
+              data = [{"btn": {"10":false}, "dur":-1}];
+            }
+            else if (a_y < -5) {
+              data = [{"btn": {"1":true}, "dur":-1}];
+            }
+            else if (a_y > 0) {
+              data = [{"btn": {"1":false}, "dur":-1}];
+            }
+            else if (a_z < -3) {
+              data = [{"btn": {"11":true}, "dur":-1}];
+            }
+            else if (a_z > 0) {
+              data = [{"btn": {"11":false}, "dur":-1}];
+            }
           }
-          else data = [{"btn": {"11":true}, "dur":-1}];
-          if (a_y > 5 || a_y < -5) {
-            data = [{"btn": {"11":true}, "dur":-1}];
-          }else data = [{"btn": {"11":true}, "dur":-1}];
-          if (a_z > 5 || a_z < -5) {
-            data = [{"btn": {"11":true}, "dur":-1}];
-          }else data = [{"btn": {"11":true}, "dur":-1}];
+          
 }
 
 var manager = function(){
@@ -403,6 +417,7 @@ obniz.onconnect = async function () {
   });
   
    window.addEventListener("deviceorientation", deviceorientationHandler);
+   window.addEventListener("devicemotion", devicemotionHandler);
 
     // Create WebSocket clients
     const tWsHost = getQueryParam("wshost", node_red_server);
