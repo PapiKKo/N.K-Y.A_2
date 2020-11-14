@@ -17,6 +17,7 @@
 <input id="dpad" type="radio" name="tilt" value="dpad" >dpad
 <input id="ang0" type="radio" name="tilt" value="ang0" checked>ang0
 <input id="ang1" type="radio" name="tilt" value="ang1">ang1
+<input id="mariokart" type="radio" name="tilt" value="mariokart" >MarioKart
 <br>
 tilt orientation: 
 <input id="portlait" type="radio" name="direction" value="portlait" checked >portlait
@@ -24,6 +25,7 @@ tilt orientation:
 <br>
 button motion: 
 <input id="a_btn" type="radio" name="button" value="btn" checked >A
+<input id="mariokart" type="radio" name="button" value="btn">MarioKart_A
 <br>
 <button id="b10" style="width:150px;height:150px">10B</button>
 <button id="b11" style="width:150px;height:150px">11A</button>
@@ -155,19 +157,17 @@ document.documentElement.addEventListener('touchend', function (e) {
 }, false);
 
 var data = [];
-const th = 10;
+const th = 2;
 var pax =0, pay = 0;
 function deviceorientationHandler(event) {
       let beta = event.beta;// X  -90 up +90 down
       let gamma = event.gamma;// Y -90 left +90 right
       //let alpha = event.alpha;// Z
-      //$('#ori').text("beta: " + beta + ", gamma: " + gamma + ", alpha: " + alpha);
       if ($('#landscape').prop('checked')){
         let d = beta;
         beta = gamma;
         gamma = -d;
       }
-
       if ($('#dpad').prop('checked')){
         if (beta < -th){
           if(gamma < -th){
@@ -180,7 +180,7 @@ function deviceorientationHandler(event) {
             // up
 						data = [{"dpad": 8, "dur":-1}];
           }
-        } else if (beta > th){
+        } else if (beta > th+20){
           if(gamma < -th){
             //down left
 						data = [{"dpad": 1, "dur":-1}];
@@ -200,6 +200,24 @@ function deviceorientationHandler(event) {
         }else{
             //neutral
 						data = [{"dpad": 5, "dur":-1}];
+        }
+        if ($('#mariokart').prop('checked')){
+          if (beta < -th){
+            data = [{"btn": {"4":true}, "dur":-1}];
+          }
+          else if(beta > 0){
+            data = [{"btn": {"4":false}, "dur":-1}];
+          }
+          else if(gamma < -th){
+            //left
+						data = [{"dpad": 4, "dur":-1}];
+        } else if (gamma > th){
+            //right
+						data = [{"dpad": 6, "dur":-1}];
+        }else{
+            //neutral
+						data = [{"dpad": 5, "dur":-1}];
+        }
         }
       }else {
         var ay = Math.floor(beta/90*127);
@@ -221,26 +239,28 @@ function devicemotionHandler(event){
           let a_y = event.acceleration.y;
           let a_z = event.acceleration.z;
           if ($('#a_btn').prop('checked')){
-            if (a_x < -5) {
-              data = [{"btn": {"10":true}, "dur":-1}];
-            }
-            else if (a_x > 0) {
-              data = [{"btn": {"10":false}, "dur":-1}];
-            }
-            else if (a_y < -5) {
-              data = [{"btn": {"1":true}, "dur":-1}];
-            }
-            else if (a_y > 0) {
-              data = [{"btn": {"1":false}, "dur":-1}];
-            }
-            else if (a_z < -3) {
+            if (a_x < -th || a_x > th) {
               data = [{"btn": {"11":true}, "dur":-1}];
             }
-            else if (a_z > 0) {
+            else if (a_x > -th || a_x < th) {
+              data = [{"btn": {"11":false}, "dur":-1}];
+            }
+            else if (a_y < -th || a_y > th) {
+              data = [{"btn": {"11":true}, "dur":-1}];
+            }
+            else if (a_y > -th || a_y < th) {
+              data = [{"btn": {"11":false}, "dur":-1}];
+            }
+            else if (a_z < -th || a_z > th) {
+              data = [{"btn": {"11":true}, "dur":-1}];
+            }
+            else if (a_z > -th || a_z < th) {
               data = [{"btn": {"11":false}, "dur":-1}];
             }
           }
-          
+           else if ($('#mariokart').prop('checked')){
+             data = [{"btn": {"11":true}, "dur":-1}];
+            }   
 }
 
 var manager = function(){
@@ -425,7 +445,7 @@ obniz.onconnect = async function () {
     const tWsUrl = `ws://${tWsHost}:${tWsPort}`;
     console.info("Websocket host url = " +  tWsUrl);
 
-    WS_CLIENTS["gamepad"] = createWsClient(tWsUrl, "ws/gamepad");
+    //WS_CLIENTS["gamepad"] = createWsClient(tWsUrl, "ws/gamepad");
 
 }
 //
